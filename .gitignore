@@ -1,0 +1,41 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+env/
+venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Environment variable files
+.env
+.env.*
+
+# macOS specific files
+.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+*.log
+
+# Byte-compiled and other compiled files
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Dash specific files
+assets/*.css
+assets/*.js
+
+# Python package files
+*.pip
