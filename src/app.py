@@ -199,16 +199,64 @@ app.layout = html.Div(children=[
     html.Div(
         className="optimal-portfolio-card",
         children=[
-            html.H2("Portefeuille optimal (Ratio de Sharpe le plus élevé)", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold"}),
+            html.Div(
+                style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'align-items': 'center'},
+                children=[
+                    html.Img(
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa3cRTInobdxdEveQUrQtJ28uKgEdFrJEQCw&s",
+                        style={
+                            'width': '40px',
+                            'height': '40px',
+                            'border-radius': '50%',
+                            'border': '1px solid green'
+                        }
+                    ),
+                    html.H2("Portefeuille optimal :", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold"}),
+                    html.H2("Portefeuille 17", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'color': 'green'})
+                ]
+            ),
             html.Hr(style={"width": "100%", "border": "1px solid lightgrey"}),
-            html.P(f"Rendement: {portfolio_17['Rendement']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal"}),
-            html.P(f"Risque: {portfolio_17['Risque (Volatilité)']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal"}),
-            html.P(f"Ratio de Sharpe: {portfolio_17['Ratio de Sharpe']:.2f}", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal"}),
-            html.P("Poids:", style={'text-align': 'left', 'font-weight': 'bold', "fontFamily": "Arial", "fontWeight": "normal"}),
-            html.Ul([
-                html.Li(f"{col}: {portfolio_17[col]}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal"})
-                for col in weights_df.columns
-            ])
+            html.Div(
+                style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'justify-content': 'space-between', 'padding-top': '30px'},
+                children=[
+                    html.Div(
+                        style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px', 'border-right': '1px solid lightgrey', 'padding-right': '30px'},
+                        children=[
+                            html.Div(   
+                                style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
+                                children=[
+                                    html.P("Rendement:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                    html.P(f"{portfolio_17['Rendement']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px'}),
+                                ]
+                            ),  
+                            html.Div(
+                                style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
+                                children=[
+                                    html.P("Risque:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                    html.P(f"{portfolio_17['Risque (Volatilité)']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px'}),
+                                ]
+                            ),
+                            html.Div(
+                                style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
+                                children=[
+                                    html.P("Ratio de Sharpe:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                    html.P(f"{portfolio_17['Ratio de Sharpe']:.2f}", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px'}),
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.Div(   
+                        style={'display': 'flex', 'flex-direction': 'column', 'padding-left': '30px'},
+                        children=[
+                            html.P("Composition:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                            html.Ul([
+                                html.Li(f"{col}: {portfolio_17[col]}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'margin-bottom': '10px', 'font-size': '18px'})
+                                for col in weights_df.columns
+                            ])
+                        ]
+                    )
+                ],
+            ),
         ],
         style={ 
             'padding': '30px',
