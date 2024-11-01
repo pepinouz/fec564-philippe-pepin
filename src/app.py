@@ -112,6 +112,36 @@ efficient_frontier_df['Ratio de Sharpe'] = (efficient_frontier_df['Rendement'] -
 # Sélection du portefeuille 17 dans le DataFrame efficient_frontier_df
 portfolio_17 = efficient_frontier_df.iloc[16]
 
+# Formater le DataFrame pour inclure les pourcentages dans toutes les colonnes sauf la première et la dernière
+for col in efficient_frontier_df.columns[1:-1]:
+    efficient_frontier_df[col] = efficient_frontier_df[col].apply(lambda x: f"{x} %")
+    
+# Limiter le ratio de Sharpe à trois décimales
+efficient_frontier_df['Ratio de Sharpe'] = efficient_frontier_df['Ratio de Sharpe'].apply(lambda x: f"{x:.3f}")
+
+
+# Extraction des poids pour le portefeuille 17 (index 16 pour le 17e portefeuille)
+portfolio_17_weights = efficient_frontier_df.iloc[16][['Canadian Cash', 'Canadian Universe Bonds', 'Canadian Large Cap',
+                                                       'Developed World Equity', 'US REITs', 'Emerging Market Equity', 
+                                                       'Commodities', 'U.S. Core Real Estate']].apply(lambda x: float(str(x).replace('%', '')))
+
+# Création du graphique en camembert (Pie chart) pour le portefeuille 17
+portfolio_17_pie_chart = dcc.Graph(
+    id='portfolio-17-pie-chart',
+    figure={
+        'data': [
+            go.Pie(
+                labels=portfolio_17_weights.index,
+                values=portfolio_17_weights.values,
+                hole=.3  # Donut-style chart; remove if you prefer a classic pie chart
+            )
+        ],
+        'layout': go.Layout(
+            title='Répartition des Actifs - Portefeuille 17'
+        )
+    }
+)
+
 # Application Dash
 app = dash.Dash(__name__)
 
@@ -161,112 +191,141 @@ app.layout = html.Div(children=[
             )
         }
     ),
-    html.H1(style={'textAlign': 'center', 'color': 'green', 'fontFamily': 'Arial','marginTop': '80px', 'marginBottom': '30px'}, children="Tableau des portefeuilles (en %)"),
+    html.H1(style={'textAlign': 'center', 'fontFamily': 'Arial','marginTop': '80px', 'marginBottom': '30px'}, children="Tableau des portefeuilles (en %)"),
+    html.P(style={'textAlign': 'center', 'fontFamily': 'Arial', 'margin-bottom': '30px', 'color': 'darkslategray', 'max-width': '600px', 'margin': 'auto'}, children="Voici les rendements et les risques des portefeuilles de la frontière efficiente, ainsi que leur composition. Les pourcentages sont arrondis à la deuxième décimale."),
     dash_table.DataTable(
         id='portfolio-table',
         columns=[{"name": i, "id": i} for i in current_portfolio_df.columns],
         data=current_portfolio_df.to_dict('records'),
-        style_table={'overflowX': 'auto', 'width': '70%', 'margin': 'auto'},
-        style_cell={'textAlign': 'center', 'padding': '10px'},
+        style_table={'overflowX': 'auto', 'width': '70%', 'margin': 'auto', 'margin-bottom': '60px', 'margin-top': '50px'},
+        style_cell={'textAlign': 'center', 'padding': '15px', 'border-right': 'none', 'border-left': 'none'},
         style_header={
-            'backgroundColor': 'lightgrey',
+            'backgroundColor': '#f8f9fa',
             'border': '1px solid grey',
-            'padding': '10px',
-            'fontWeight': 'bold'
+            'border-right': 'none',
+            'border-left': 'none',
+            'border-top': 'none',
+            'padding': '20px',
+            'fontWeight': 'bold',
+            'fontFamily': 'Arial'
         },
+        style_data_conditional=[
+            {
+                'if': {'column_id': 'Titre'},
+                'border-right': '1px solid lightgrey',
+                'fontWeight': 'bold'
+            }
+        ]
     ),
     dash_table.DataTable(
         id='portfolio-table',
         columns=[{"name": i, "id": i} for i in efficient_frontier_df.columns],
         data=efficient_frontier_df.to_dict('records'),
         style_table={'overflowX': 'auto', 'width': '70%', 'margin': 'auto'},
-        style_cell={'textAlign': 'center', 'padding': '10px'},
+        style_cell={'textAlign': 'center', 'padding': '15px', 'border-right': 'none', 'border-left': 'none'},
         style_header={
-            'backgroundColor': 'lightgrey',
+            'backgroundColor': '#f8f9fa',
             'border': '1px solid grey',
-            'padding': '10px',
-            'fontWeight': 'bold'
+            'border-right': 'none',
+            'border-left': 'none',
+            'border-top': 'none',
+            'padding': '20px',
+            'fontWeight': 'bold',
+            'fontFamily': 'Arial'
         },
         style_data_conditional=[
             {
-                'if': {'filter_query': '{Titre} = "Portefeuille   17"'},
-                'backgroundColor': '#D3D3D3',  # Couleur grise claire
-                'color': 'black',
-                'fontWeight': 'bold'
-            }
-        ]
-    ),
-    html.Div(
-        className="optimal-portfolio-card",
-        children=[
-            html.Div(
-                style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'align-items': 'center'},
-                children=[
-                    html.Img(
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa3cRTInobdxdEveQUrQtJ28uKgEdFrJEQCw&s",
-                        style={
-                            'width': '40px',
-                            'height': '40px',
-                            'border-radius': '50%',
-                            'border': '1px solid green'
-                        }
-                    ),
-                    html.H2("Portefeuille optimal :", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold"}),
-                    html.H2("Portefeuille 17", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'color': 'green'})
-                ]
-            ),
-            html.Hr(style={"width": "100%", "border": "1px solid lightgrey"}),
-            html.Div(
-                style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'justify-content': 'space-between', 'padding-top': '30px'},
-                children=[
-                    html.Div(
-                        style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px', 'border-right': '1px solid lightgrey', 'padding-right': '30px'},
-                        children=[
-                            html.Div(   
-                                style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
-                                children=[
-                                    html.P("Rendement:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
-                                    html.P(f"{portfolio_17['Rendement']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px'}),
-                                ]
-                            ),  
-                            html.Div(
-                                style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
-                                children=[
-                                    html.P("Risque:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
-                                    html.P(f"{portfolio_17['Risque (Volatilité)']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px'}),
-                                ]
-                            ),
-                            html.Div(
-                                style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
-                                children=[
-                                    html.P("Ratio de Sharpe:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
-                                    html.P(f"{portfolio_17['Ratio de Sharpe']:.2f}", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px'}),
-                                ]
-                            ),
-                        ]
-                    ),
-                    html.Div(   
-                        style={'display': 'flex', 'flex-direction': 'column', 'padding-left': '30px'},
-                        children=[
-                            html.P("Composition:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
-                            html.Ul([
-                                html.Li(f"{col}: {portfolio_17[col]}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'margin-bottom': '10px', 'font-size': '18px'})
-                                for col in weights_df.columns
-                            ])
-                        ]
-                    )
-                ],
-            ),
-        ],
-        style={ 
-            'padding': '30px',
-            'width': 'fit-content',
-            'margin': '30px auto',
-            'background-color': 'white',
-            'border': '1px solid #dee2e6',
-            'border-radius': '8px',
+                'if': {'column_id': efficient_frontier_df.columns[0]},  # First column
+                'paddingRight': '42px',
+                'fontWeight': 'bold',
+                'border-right': '1px solid lightgrey'
+        },
+        {
+            'if': {'filter_query': '{Titre} = "Portefeuille   17"'},
+            'backgroundColor': '#f0f1f2',
+            'color': 'black',
+            'fontWeight': 'bold'
         }
+    ]
     ),
+    html.Div(style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px', 'align-items': 'center', 'justify-content': 'center', 'padding-top': '60px'}, children=[
+        html.Div(   
+            className="optimal-portfolio-card",
+            children=[
+                html.Div(
+                    style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'align-items': 'center'},
+                    children=[
+                        html.Img(
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa3cRTInobdxdEveQUrQtJ28uKgEdFrJEQCw&s",
+                            style={
+                                'width': '40px',
+                                'height': '40px',
+                                'border-radius': '50%',
+                                'border': '1px solid green'
+                            }
+                        ),
+                        html.H2("Portefeuille optimal :", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold"}),
+                        html.H2("Portefeuille 17", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'color': 'green'})
+                    ]
+                ),  
+                html.Hr(style={"width": "100%", "border": "1px solid lightgrey"}),
+                html.Div(   
+                    style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'justify-content': 'space-between', 'padding-top': '30px'},
+                    children=[
+                        html.Div(
+                            style={'display': 'flex', 'flex-direction': 'column', 'gap': '5px', 'border-right': '1px solid lightgrey', 'padding-right': '30px'},
+                            children=[
+                                html.Div(   
+                                    style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
+                                    children=[
+                                        html.P("Rendement:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                        html.P(f"{portfolio_17['Rendement']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px', 'color': 'darkslategray'}),
+                                    ]
+                                ),  
+                                html.Div(
+                                    style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
+                                    children=[
+                                        html.P("Risque:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                        html.P(f"{portfolio_17['Risque (Volatilité)']}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px', 'color': 'darkslategray'}),
+                                    ]
+                                ),
+                                html.Div(
+                                    style={'display': 'flex', 'flex-direction': 'row', 'gap': '5px'},
+                                    children=[
+                                        html.P("Ratio de Sharpe:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                        html.P(f"{portfolio_17['Ratio de Sharpe']:.2f}", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'font-size': '20px', 'color': 'darkslategray'}),
+                                    ]
+                                )
+                            ]
+                        ),
+                        html.Div(   
+                            style={'display': 'flex', 'flex-direction': 'column', 'padding-left': '30px'},
+                            children=[
+                                html.P("Composition:", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "bold", 'font-size': '20px'}),
+                                html.Ul([
+                                    html.Li(f"{col}: {portfolio_17[col]}%", style={'text-align': 'left', "fontFamily": "Arial", "fontWeight": "normal", 'margin-bottom': '10px', 'font-size': '18px', 'color': 'darkslategray'})
+                                    for col in weights_df.columns
+                                ])
+                            ]
+                        )
+                    ],
+                ),
+            ],
+            style={ 
+                'padding': '30px',
+                'width': 'fit-content',
+                'background-color': 'white',
+                'border': '1px solid #dee2e6',
+                'border-radius': '8px',
+            }
+        ),
+        html.Div(
+            children=[
+                portfolio_17_pie_chart
+    ],
+            style={'width': '40%',}
+        )
+    ]),
     html.Div(
         className="card",
         children=[
