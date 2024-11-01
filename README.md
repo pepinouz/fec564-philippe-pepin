@@ -1,5 +1,3 @@
-Voici un exemple de README.md pour votre projet GitHub sur l’optimisation de portefeuille avec Dash et Python :
-
 Optimisation de Portefeuille - FEC 564
 
 Ce projet implémente une application web d’optimisation de portefeuille, en utilisant Python, Dash, et Plotly. L’application permet de visualiser la frontière efficiente et d’explorer divers portefeuilles pour trouver un équilibre optimal entre le rendement et le risque, dans le contexte de gestion d’un portefeuille de caisse de retraite.
